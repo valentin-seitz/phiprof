@@ -1,14 +1,17 @@
 # source files.
 SRC = prettyprinttable.cpp timerdata.cpp timertree.cpp paralleltimertree.cpp timer.cpp phiprof.cpp phiprof_c.cpp 
 SRC_NO = nophiprof.cpp phiprof_c.cpp timer.cpp
+SRC_NESMIK = nesmikprof.cpp phiprof_c.cpp timer.cpp
 OBJ = $(SRC:.cpp=.o) 
 FOBJ = phiprof_fortran.o
 OBJ_NO = $(SRC_NO:.cpp=.o) 
+OBJ_NESMIK = $(SRC_NESMIK:.cpp=.o) 
 FOBJ_NO = phiprof_fortran.o
 OUT_STATIC = ../lib/libphiprof.a
 OUT_STATIC_NO = ../lib/libnophiprof.a
 OUT_SHARED = ../lib/libphiprof.so
 OUT_SHARED_NO = ../lib/libnophiprof.so
+OUT_SHARED_NESMIK = ../lib/libnesmikprof.so
 
 # Set the default compiler type (pgi, nvcc, hipcc, gcc, intel, clang). Can be overriden from command-line.
 CC = gcc
@@ -18,7 +21,7 @@ CCC = mpicc
 FTN = mpifort
 #CCC = mpic++
 #FTN = mpif90
-
+NESMIK_HOME=
 #Set clock.
 #CLOCK_MONOTONIC_COARSE is (much) faster, but has very poor
 # resolution. Also only available on newer linux kernels see man
@@ -26,10 +29,11 @@ FTN = mpifort
 CLOCK_ID = CLOCK_MONOTONIC
 
 # C++ compiler flags 
-CCFLAGS = -fpic -O2 -std=c++17 -DCLOCK_ID=$(CLOCK_ID)
+CCFLAGS = -fpic -O2 -std=c++17 -DCLOCK_ID=$(CLOCK_ID) -I${NESMIK_HOME}/include
 FFLAGS= -fpic -O2
 
-LDFLAGS = -lstdc++ 
+LDFLAGS = -lstdc++ -L${NESMIK_HOME}/lib
+
 
 # Compiler-specific options
 ifeq ($(CC),pgi)
@@ -61,7 +65,7 @@ endif
 
 default: all
 
-all: $(OUT_STATIC) $(OUT_STATIC_NO) $(OUT_SHARED)  $(OUT_SHARED_NO) includedir
+all: $(OUT_STATIC) $(OUT_STATIC_NO) $(OUT_SHARED)  $(OUT_SHARED_NO) $(OUT_SHARED_NESMIK) includedir
 
 all-w-fortran:  $(OUT_STATIC) $(OUT_STATIC_NO) $(OUT_SHARED)  $(OUT_SHARED_NO)  includedir-w-fortran fortran
 
@@ -95,6 +99,9 @@ $(OUT_SHARED): $(OBJ) libdir
 
 $(OUT_SHARED_NO): $(OBJ_NO) libdir
 	$(CCC) -shared $(OBJ_NO) -o $(OUT_SHARED_NO) $(LDFLAGS)
+
+$(OUT_SHARED_NESMIK): $(OBJ_NESMIK) libdir
+	$(CCC) -shared $(OBJ_NESMIK) -o $(OUT_SHARED_NESMIK) $(LDFLAGS) -lnesmik
 
 libdir:
 	mkdir -p ../lib
