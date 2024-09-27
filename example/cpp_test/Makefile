@@ -7,7 +7,7 @@ INCLUDES =
 
 # C++ compiler flags (-g -O2 -Wall)
 CCFLAGS = -O3 -I../../include  -fopenmp
-LDFLAGS = -L../../lib -lphiprof  -lgomp -ldl -lrt
+LDFLAGS = -L../../lib -lnesmikprof  -lgomp -ldl -lrt
 # compiler
 CCC = mpic++
 
