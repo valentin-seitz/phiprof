@@ -4,17 +4,33 @@ This file contains a few hotfixes to generate libnesmikprof.so which acts as a d
 
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include "mpi.h"
+#include <mutex>
 
 #include "nesmik/nesmik.hpp"
+//namespace nesmik{
+//   void nesmik_init(){
+
+//   }
+//   void nesmik_finalize(){
+
+   //}
+   //void region_stop(const std::string &r){
+
+   //}
+    //void region_start(const std::string &r){
+
+   //}
+//}
 
 using namespace std; // antipattern
 
 namespace phiprof
 {
 
-   static thread_local map<int,string> id_to_label;
+   static unordered_map<int,string> id_to_label{};
+
    bool initialize(){
       nesmik::nesmik_init();
       return true;
@@ -55,6 +71,8 @@ namespace phiprof
    int getChildId([[maybe_unused]] const std::string &label) {return 0;}
    
    int initializeTimer([[maybe_unused]] const string &label){
+      std::mutex m;
+      std::lock_guard<std::mutex> lockGuard(m);
       int new_id = id_to_label.size()+1;
       id_to_label[new_id] = label;
       return new_id;
