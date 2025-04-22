@@ -30,6 +30,7 @@ namespace phiprof
 {
 
    static unordered_map<int,string> id_to_label{};
+   static std::mutex m;
 
    bool initialize(){
       nesmik::nesmik_init();
@@ -71,7 +72,6 @@ namespace phiprof
    int getChildId([[maybe_unused]] const std::string &label) {return 0;}
    
    int initializeTimer([[maybe_unused]] const string &label){
-      std::mutex m;
       std::lock_guard<std::mutex> lockGuard(m);
       int new_id = id_to_label.size()+1;
       id_to_label[new_id] = label;
