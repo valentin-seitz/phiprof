@@ -44,6 +44,7 @@ namespace phiprof
    }
 
    bool start([[maybe_unused]] int id){
+      std::lock_guard<std::mutex> lockGuard(m);
       if (id_to_label.count(id)){
          const auto& label = id_to_label[id];
          start(label);
@@ -58,6 +59,7 @@ namespace phiprof
    }
 
    bool stop ([[maybe_unused]] int id) {
+      std::lock_guard<std::mutex> lockGuard(m);
       if (id_to_label.count(id)){
          const auto& label = id_to_label[id];
          stop(label,0.0,"");
